@@ -52,7 +52,7 @@ class _DirectoryFileAssetPickerState extends State<DirectoryFileAssetPicker>
     final FileAssetPickerBuilder builder = FileAssetPickerBuilder(
       provider: provider,
     );
-    final List<File>? result = await AssetPicker.pickAssetsWithDelegate(
+    final PickResult<File>? result = await AssetPicker.pickAssetsWithDelegate(
       context,
       delegate: builder,
       provider: provider,
@@ -60,7 +60,7 @@ class _DirectoryFileAssetPickerState extends State<DirectoryFileAssetPicker>
     if (result != null) {
       fileList
         ..clear()
-        ..addAll(result);
+        ..addAll(result.assets);
       if (mounted) {
         setState(() {});
       }

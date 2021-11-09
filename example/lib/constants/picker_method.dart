@@ -311,7 +311,7 @@ class PickMethod {
   final String description;
 
   /// The core function that defines how to use the picker.
-  final Future<List<AssetEntity>?> Function(
+  final Future<PickResult<AssetEntity>?> Function(
     BuildContext context,
     List<AssetEntity> selectedAssets,
   ) method;

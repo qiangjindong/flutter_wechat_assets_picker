@@ -7,8 +7,9 @@ import 'package:flutter/widgets.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart'
     show
         AssetEntity,
+        DefaultAssetPickerBuilderDelegate,
         DefaultAssetPickerProvider,
-        DefaultAssetPickerBuilderDelegate;
+        PickResult;
 
 import '../widgets/method_list_view.dart';
 import '../widgets/selected_assets_list_view.dart';
@@ -37,9 +38,9 @@ mixin ExamplePageMixin<T extends StatefulWidget> on State<T> {
   DefaultAssetPickerBuilderDelegate? keepScrollDelegate;
 
   Future<void> selectAssets(PickMethod model) async {
-    final List<AssetEntity>? result = await model.method(context, assets);
+    final PickResult<AssetEntity>? result = await model.method(context, assets);
     if (result != null) {
-      assets = List<AssetEntity>.from(result);
+      assets = List<AssetEntity>.from(result.assets);
       if (mounted) {
         setState(() {});
       }

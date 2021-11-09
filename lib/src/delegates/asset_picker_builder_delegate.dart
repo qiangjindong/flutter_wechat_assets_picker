@@ -463,9 +463,14 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
     );
   }
 
+  bool _isOriginal = false;
+
   /// Action bar widget aligned to bottom.
   /// 底部操作栏部件
   Widget bottomActionBar(BuildContext context) {
+    final StreamController<bool> controller =
+        StreamController<bool>.broadcast();
+
     Widget child = Container(
       height: bottomActionBarHeight + context.bottomPadding,
       padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(
@@ -475,6 +480,43 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
       child: Row(
         children: <Widget>[
           if (!isSingleAssetMode || !isAppleOS) previewButton(context),
+          if (isAppleOS) const Spacer(),
+          StreamBuilder<bool>(
+            stream: controller.stream,
+            initialData: _isOriginal,
+            builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+              final bool checked = snapshot.requireData;
+
+              Widget checkedIcon(bool checked) {
+                return checked
+                    ? Icon(
+                        Icons.check_circle_outlined,
+                        color: themeColor,
+                        size: 22,
+                      )
+                    : const Icon(Icons.circle_outlined, size: 22);
+              }
+
+              return GestureDetector(
+                onTap: () {
+                  _isOriginal = !_isOriginal;
+                  controller.sink.add(_isOriginal);
+                },
+                child: Row(
+                  children: <Widget>[
+                    checkedIcon(checked),
+                    const Text(
+                      '原图',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
           if (isAppleOS) const Spacer(),
           if (isAppleOS) confirmButton(context),
         ],
@@ -1209,7 +1251,9 @@ class DefaultAssetPickerBuilderDelegate
           ),
           onPressed: () {
             if (provider.isSelectedNotEmpty) {
-              Navigator.of(context).maybePop(provider.selectedAssets);
+              Navigator.of(context).maybePop(
+                PickResult<AssetEntity>(provider.selectedAssets, _isOriginal),
+              );
             }
           },
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -1603,7 +1647,8 @@ class DefaultAssetPickerBuilderDelegate
               maxAssets: provider.maxAssets,
             );
             if (result != null) {
-              Navigator.of(context).maybePop(result);
+              Navigator.of(context)
+                  .maybePop(PickResult<AssetEntity>(result, _isOriginal));
             }
           },
           child: Selector<DefaultAssetPickerProvider, String>(
@@ -1699,7 +1744,9 @@ class DefaultAssetPickerBuilderDelegate
             }
             provider.selectAsset(asset);
             if (isSingleAssetMode && !isPreviewEnabled) {
-              Navigator.of(context).maybePop(provider.selectedAssets);
+              Navigator.of(context).maybePop(
+                PickResult<AssetEntity>(provider.selectedAssets, _isOriginal),
+              );
             }
           },
           child: Container(
@@ -1781,7 +1828,8 @@ class DefaultAssetPickerBuilderDelegate
             shouldReversePreview: isAppleOS,
           );
           if (result != null) {
-            Navigator.of(context).maybePop(result);
+            Navigator.of(context)
+                .maybePop(PickResult<AssetEntity>(result, _isOriginal));
           }
         },
         child: Consumer<DefaultAssetPickerProvider>(

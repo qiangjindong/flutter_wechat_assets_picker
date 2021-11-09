@@ -23,7 +23,7 @@ class AssetPicker<Asset, Path> extends StatefulWidget {
 
   /// Static method to push with the navigator.
   /// 跳转至选择器的静态方法
-  static Future<List<AssetEntity>?> pickAssets(
+  static Future<PickResult<AssetEntity>?> pickAssets(
     BuildContext context, {
     List<AssetEntity>? selectedAssets,
     int maxAssets = 9,
@@ -115,11 +115,11 @@ class AssetPicker<Asset, Path> extends StatefulWidget {
         ),
       ),
     );
-    final List<AssetEntity>? result = await Navigator.of(
+    final PickResult<AssetEntity>? result = await Navigator.of(
       context,
       rootNavigator: useRootNavigator,
-    ).push<List<AssetEntity>>(
-      AssetPickerPageRoute<List<AssetEntity>>(
+    ).push<PickResult<AssetEntity>>(
+      AssetPickerPageRoute<PickResult<AssetEntity>>(
         builder: picker,
         transitionCurve: routeCurve,
         transitionDuration: routeDuration,
@@ -130,7 +130,7 @@ class AssetPicker<Asset, Path> extends StatefulWidget {
 
   /// Call the picker with provided [delegate] and [provider].
   /// 通过指定的 [delegate] 和 [provider] 调用选择器
-  static Future<List<Asset>?> pickAssetsWithDelegate<Asset, Path,
+  static Future<PickResult<Asset>?> pickAssetsWithDelegate<Asset, Path,
       PickerProvider extends AssetPickerProvider<Asset, Path>>(
     BuildContext context, {
     required AssetPickerBuilderDelegate<Asset, Path> delegate,
@@ -148,17 +148,17 @@ class AssetPicker<Asset, Path> extends StatefulWidget {
         builder: delegate,
       ),
     );
-    final List<Asset>? result = await Navigator.of(
+    final PickResult<Asset>? result = await Navigator.of(
       context,
       rootNavigator: useRootNavigator,
-    ).push<List<Asset>>(
-      AssetPickerPageRoute<List<Asset>>(
+    ).push<PickResult<Asset>>(
+      AssetPickerPageRoute<PickResult<Asset>>(
         builder: picker,
         transitionCurve: routeCurve,
         transitionDuration: routeDuration,
       ),
     );
-    return result;
+    return result!;
   }
 
   /// Register observe callback with assets changes.
@@ -291,4 +291,11 @@ class AssetPickerState<Asset, Path> extends State<AssetPicker<Asset, Path>>
   Widget build(BuildContext context) {
     return widget.builder.build(context);
   }
+}
+
+class PickResult<T> {
+  PickResult(this.assets, this.isOrigianl);
+
+  final List<T> assets;
+  final bool isOrigianl;
 }
